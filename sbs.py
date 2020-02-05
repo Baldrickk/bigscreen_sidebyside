@@ -7,14 +7,18 @@ outfile = '.'.join((p1, "edit", p2))
 
 with Image.open(infile) as inf:
     iw, ih = inf.size
-    boxl = (0, 0, iw / 2, ih)
-    boxr = (iw / 2, 0, iw, ih)
-    iml = inf.crop(boxl).resize((int(iw / 2), ih * 2))
-    imr = inf.crop(boxr).resize((int(iw / 2), ih * 2))
+    iw = iw // 2
+    boxl = (0, 0, iw, ih)
+    boxr = (iw, 0, iw * 2, ih)
+    imr = inf.crop(boxr).resize((iw, ih * 2))
+    iml = inf.crop(boxl).resize((iw, ih * 2))
 
-    ow = iw * 2
-    oh = ih * 2
+    ow = 2 * max(2 * iw, int(ih * 11.0 / 9.0))
+    oh = 2 * max(ih, int(iw * 9.0 / 11.0))
+    
     output = Image.new('RGB', (ow, oh), color='black')
-    output.paste(iml, (int(ow * (1 / 8)), 0, int(ow * (3 / 8)), oh))
-    output.paste(imr, (int(ow * (5 / 8)), 0, int(ow * (7 / 8)), oh))
+    imlw, imlh = iml.size
+    imrw, imrh = imr.size
+    output.paste(iml, ((ow * 1) // 4 - imlw // 2, oh // 2 - imlh // 2, (ow * 1) // 4 + imlw // 2, oh // 2 + imlh // 2))
+    output.paste(imr, ((ow * 3) // 4 - imrw // 2, oh // 2 - imrh // 2, (ow * 3) // 4 + imrw // 2, oh // 2 + imrh // 2))
     output.save(outfile)
